@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/home.css">
+    <link rel="stylesheet" href="/plancreate.css">
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="app-header">
+        <div>
+          <p class="route-label">/plans/create</p>
+          <h1>旅行プランを作成する</h1>
+        </div>
+        <a class="ghost-button" href="/plans">一覧へ戻る</a>
+      </header>
+
+      <form class="editor-panel" action="/plans" method="post">
+        <section class="form-section">
+          <h2>基本情報</h2>
+          <div class="form-grid">
+            <label>
+              <span>タイトル</span>
+              <input type="text" name="name" required placeholder="例：春の京都旅行">
+            </label>
+            <label>
+              <span>ステータス</span>
+              <select name="status">
+                <option value="計画中">計画中</option>
+                <option value="完了">完了</option>
+              </select>
+            </label>
+            <label>
+              <span>開始日</span>
+              <input type="date" name="started_at">
+            </label>
+            <label>
+              <span>終了日</span>
+              <input type="date" name="ended_at">
+            </label>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <div class="section-heading">
+            <h2>行程・スポット</h2>
+            <button class="secondary-button" type="button" data-add-schedule>＋ スポットを追加</button>
+          </div>
+          <div class="schedule-list" data-schedule-list>
+            <%- include("schedule-fields", { mode: "new", index: 1, schedule: null, formatDateTime }) %>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h2>持ち物リスト</h2>
+          <label>
+            <span>1行に1つずつ入力</span>
+            <textarea name="item_names" rows="5" placeholder="充電器&#10;保険証&#10;折りたたみ傘"></textarea>
+          </label>
+        </section>
+
+        <div class="sticky-actions">
+          <button class="primary-button" type="submit">作成</button>
+          <a class="ghost-button" href="/plans">キャンセル</a>
+        </div>
+      </form>
+
+      <template id="scheduleTemplate">
+        <%- include("schedule-fields", { mode: "new", index: "__INDEX__", schedule: null, formatDateTime }) %>
+      </template>
+    </main>
+    <script src="/planform.js"></script>
+  </body>
+</html>

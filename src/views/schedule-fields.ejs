@@ -1,0 +1,62 @@
+<article class="schedule-editor" data-schedule-editor>
+  <header>
+    <strong><%= mode === "existing" ? `${index}. 登録済みスポット` : `${index}. スポット` %></strong>
+    <select name="<%= mode === "existing" ? "existing_schedule_type" : "schedule_type" %>">
+      <option value="spot" <%= schedule && schedule.type === "spot" ? "selected" : "" %>>目的地</option>
+      <option value="move" <%= schedule && schedule.type === "move" ? "selected" : "" %>>移動</option>
+    </select>
+  </header>
+  <% if (mode === "existing" && schedule) { %>
+    <input type="hidden" name="existing_schedule_id" value="<%= schedule.id %>">
+  <% } %>
+  <div class="form-grid compact">
+    <label>
+      <span>目的地・移動名</span>
+      <input type="text" name="<%= mode === "existing" ? "existing_schedule_name" : "schedule_name" %>" value="<%= schedule ? schedule.name : "" %>" placeholder="例：清水寺、東京駅→京都駅">
+    </label>
+    <label>
+      <span>予算</span>
+      <input type="number" min="0" name="<%= mode === "existing" ? "existing_schedule_budget" : "schedule_budget" %>" value="<%= schedule ? schedule.budget : 0 %>">
+    </label>
+    <label>
+      <span>到着</span>
+      <input type="datetime-local" name="<%= mode === "existing" ? "existing_schedule_start_at" : "schedule_start_at" %>" value="<%= schedule ? formatDateTime(schedule.startAt) : "" %>">
+    </label>
+    <label>
+      <span>出発</span>
+      <input type="datetime-local" name="<%= mode === "existing" ? "existing_schedule_end_at" : "schedule_end_at" %>" value="<%= schedule ? formatDateTime(schedule.endAt) : "" %>">
+    </label>
+    <label>
+      <span>URL</span>
+      <input type="url" name="<%= mode === "existing" ? "existing_schedule_url" : "schedule_url" %>" value="<%= schedule && schedule.url ? schedule.url : "" %>" placeholder="https://...">
+    </label>
+    <label>
+      <span>写真URL</span>
+      <input type="url" name="<%= mode === "existing" ? "existing_schedule_photo_url" : "schedule_photo_url" %>" value="<%= schedule && schedule.photoUrl ? schedule.photoUrl : "" %>" placeholder="https://...">
+    </label>
+    <label>
+      <span>現在の天気</span>
+      <input type="text" name="<%= mode === "existing" ? "existing_schedule_weather" : "schedule_weather" %>" value="<%= schedule && schedule.weather ? schedule.weather : "" %>" placeholder="晴れ、18℃">
+    </label>
+    <label>
+      <span>服装メモ</span>
+      <input type="text" name="<%= mode === "existing" ? "existing_schedule_outfit" : "schedule_outfit" %>" value="<%= schedule && schedule.outfit ? schedule.outfit : "" %>" placeholder="薄手の上着">
+    </label>
+    <label>
+      <span>出発地</span>
+      <input type="text" name="<%= mode === "existing" ? "existing_schedule_from_place" : "schedule_from_place" %>" value="<%= schedule && schedule.fromPlace ? schedule.fromPlace : "" %>">
+    </label>
+    <label>
+      <span>到着地</span>
+      <input type="text" name="<%= mode === "existing" ? "existing_schedule_to_place" : "schedule_to_place" %>" value="<%= schedule && schedule.toPlace ? schedule.toPlace : "" %>">
+    </label>
+    <label>
+      <span>移動手段</span>
+      <input type="text" name="<%= mode === "existing" ? "existing_schedule_transportation" : "schedule_transportation" %>" value="<%= schedule && schedule.transportation ? schedule.transportation : "" %>" placeholder="電車、徒歩、車">
+    </label>
+    <label class="wide">
+      <span>詳細メモ</span>
+      <textarea name="<%= mode === "existing" ? "existing_schedule_memo" : "schedule_memo" %>" rows="3" placeholder="予約番号、営業時間、注意点など"><%= schedule && schedule.memo ? schedule.memo : "" %></textarea>
+    </label>
+  </div>
+</article>

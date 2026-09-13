@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/home.css">
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="app-header">
+        <div>
+          <p class="route-label">/users</p>
+          <h1>ユーザー管理</h1>
+        </div>
+        <a class="ghost-button" href="/plans">計画一覧へ</a>
+      </header>
+
+      <section class="modal-like">
+        <form class="inline-add user-form" action="<%= editingUser ? `/users/${editingUser.id}/update` : "/users" %>" method="post">
+          <input type="text" name="name" value="<%= editingUser ? editingUser.name : "" %>" placeholder="ユーザー名" required>
+          <input type="email" name="email" value="<%= editingUser ? editingUser.email : "" %>" placeholder="email@example.com" required>
+          <button class="primary-button" type="submit"><%= editingUser ? "更新" : "追加" %></button>
+          <% if (editingUser) { %><a class="ghost-button" href="/users">キャンセル</a><% } %>
+        </form>
+
+        <ul class="user-list">
+          <% users.forEach((user) => { %>
+            <li>
+              <span><strong><%= user.name %></strong><small><%= user.email %></small></span>
+              <a class="ghost-button" href="/users/<%= user.id %>/edit">編集</a>
+              <form action="/users/<%= user.id %>/delete" method="post" onsubmit="return confirm('ユーザーを削除しますか？')">
+                <button class="danger-button" type="submit">削除</button>
+              </form>
+            </li>
+          <% }) %>
+        </ul>
+      </section>
+    </main>
+  </body>
+</html>

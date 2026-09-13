@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/home.css">
+    <link rel="stylesheet" href="/plan.css">
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="app-header">
+        <div>
+          <p class="route-label">/plans/<%= plan.id %></p>
+          <h1><%= plan.name %></h1>
+          <p class="subline">
+            <span class="status-pill <%= plan.status === "完了" ? "is-done" : "" %>"><%= plan.status %></span>
+            <%= formatDate(plan.startedAt) || "日程未定" %>
+            <% if (plan.endedAt) { %> 〜 <%= formatDate(plan.endedAt) %><% } %>
+          </p>
+        </div>
+        <nav class="header-actions">
+          <a class="ghost-button" href="/plans">一覧へ戻る</a>
+          <a class="secondary-button" href="/plans/<%= plan.id %>/update">編集</a>
+          <form action="/plans/<%= plan.id %>/delete" method="post" onsubmit="return confirm('この旅行計画を削除しますか？')">
+            <button class="danger-button" type="submit">削除</button>
+          </form>
+        </nav>
+      </header>
+
+      <section class="summary-strip">
+        <button type="button" data-open-dialog="budgetDialog">
+          <span>予算</span>
+          <strong><%= yen(totalBudget) %></strong>
+        </button>
+        <button type="button" data-open-dialog="itemDialog">
+          <span>持ち物</span>
+          <strong><%= packedCount %>/<%= items.length %> 完了</strong>
+        </button>
+      </section>
+
+      <section class="timeline">
+        <h2>旅行タイムライン</h2>
+        <% if (schedules.length === 0) { %>
+          <p class="muted">まだ行程がありません。編集ページからスポットを追加できます。</p>
+        <% } %>
+        <% schedules.forEach((schedule, index) => { %>
+          <article class="timeline-card">
+            <div class="timeline-marker"><%= index + 1 %></div>
+            <div class="timeline-body">
+              <header>
+                <span class="type-label"><%= schedule.type === "move" ? "移動" : "目的地" %></span>
+                <h3><%= schedule.name %></h3>
+              </header>
+              <dl class="info-grid">
+                <div><dt>到着</dt><dd><%= formatDateTime(schedule.startAt) || "未定" %></dd></div>
+                <div><dt>出発</dt><dd><%= formatDateTime(schedule.endAt) || "未定" %></dd></div>
+                <div><dt>予算</dt><dd><%= yen(schedule.budget) %></dd></div>
+                <div><dt>天気・服装</dt><dd><%= schedule.weather || "未入力" %><% if (schedule.outfit) { %> / <%= schedule.outfit %><% } %></dd></div>
+                <div><dt>移動</dt><dd><%= schedule.transportation || "未入力" %><% if (schedule.fromPlace || schedule.toPlace) { %>（<%= schedule.fromPlace || "?" %> → <%= schedule.toPlace || "?" %>）<% } %></dd></div>
+                <div><dt>URL</dt><dd><% if (schedule.url) { %><a href="<%= schedule.url %>" target="_blank" rel="noreferrer">開く</a><% } else { %>未入力<% } %></dd></div>
+              </dl>
+              <% if (schedule.photoUrl) { %>
+                <img class="spot-photo" src="<%= schedule.photoUrl %>" alt="<%= schedule.name %>の写真">
+              <% } %>
+              <% if (schedule.memo) { %>
+                <p class="memo"><%= schedule.memo %></p>
+              <% } %>
+            </div>
+          </article>
+        <% }) %>
+      </section>
+
+      <dialog class="modal" id="budgetDialog">
+        <form method="dialog" class="modal-panel">
+          <header>
+            <h2>予算管理</h2>
+            <button type="submit">×</button>
+          </header>
+          <p class="total-line">総予算：<strong><%= yen(totalBudget) %></strong></p>
+          <ul class="budget-list">
+            <% schedules.forEach((schedule) => { %>
+              <li><span><%= schedule.name %></span><strong><%= yen(schedule.budget) %></strong></li>
+            <% }) %>
+          </ul>
+        </form>
+      </dialog>
+
+      <dialog class="modal" id="itemDialog">
+        <div class="modal-panel">
+          <header>
+            <h2>持ち物リスト</h2>
+            <button type="button" data-close-dialog="itemDialog">×</button>
+          </header>
+          <p class="total-line">進捗：<strong><%= packedCount %>/<%= items.length %> 完了</strong></p>
+          <ul class="item-list">
+            <% items.forEach((item) => { %>
+              <li>
+                <form action="/plans/<%= plan.id %>/items/<%= item.id %>/toggle" method="post">
+                  <button class="check-button <%= item.packed ? "is-checked" : "" %>" type="submit" aria-label="完了切り替え"><%= item.packed ? "✓" : "" %></button>
+                </form>
+                <span><%= item.name %></span>
+                <form action="/plans/<%= plan.id %>/items/<%= item.id %>/delete" method="post">
+                  <button type="submit">削除</button>
+                </form>
+              </li>
+            <% }) %>
+          </ul>
+          <form class="inline-add" action="/plans/<%= plan.id %>/items" method="post">
+            <select name="schedule_id" aria-label="関連スポット">
+              <option value="">全体</option>
+              <% schedules.forEach((schedule) => { %>
+                <option value="<%= schedule.id %>"><%= schedule.name %></option>
+              <% }) %>
+            </select>
+            <input type="text" name="name" placeholder="持ち物名" required>
+            <button class="secondary-button" type="submit">＋ 追加</button>
+          </form>
+        </div>
+      </dialog>
+    </main>
+    <script src="/planmodal.js"></script>
+  </body>
+</html>

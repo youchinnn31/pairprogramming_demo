@@ -9,11 +9,77 @@
   <body>
     <main class="page-shell">
       <header class="app-header">
-        <h1>旅行計画アプリ（仮）</h1>
+        <div>
+          <p class="route-label">/plans</p>
+          <h1>旅行計画アプリ（仮）</h1>
+        </div>
+        <nav class="header-actions">
+          <a class="ghost-button" href="/users">ユーザー</a>
+          <a class="primary-button" href="/plans/create">＋ 新規作成</a>
+        </nav>
       </header>
-      <section class="empty-state">
-        <p>旅行計画を管理する準備ができました。</p>
-      </section>
+
+      <form class="filter-bar" action="/plans" method="get">
+        <label>
+          <span>旅行キーワードで検索</span>
+          <input type="search" name="keyword" value="<%= keyword %>" placeholder="例：京都、卒業旅行">
+        </label>
+        <label>
+          <span>ステータス</span>
+          <select name="status">
+            <option value="" <%= status === "" ? "selected" : "" %>>すべて</option>
+            <option value="計画中" <%= status === "計画中" ? "selected" : "" %>>計画中</option>
+            <option value="完了" <%= status === "完了" ? "selected" : "" %>>完了</option>
+          </select>
+        </label>
+        <button class="secondary-button" type="submit">検索</button>
+      </form>
+
+      <% if (plans.length === 0) { %>
+        <section class="empty-state">
+          <p>旅行計画はまだありません。</p>
+          <a class="primary-button" href="/plans/create">最初の旅行計画を作る</a>
+        </section>
+      <% } else { %>
+        <section class="plan-grid" aria-label="旅行計画一覧">
+          <% plans.forEach((plan) => { %>
+            <article class="plan-card">
+              <div class="plan-card-top">
+                <span class="status-pill <%= plan.status === "完了" ? "is-done" : "" %>"><%= plan.status %></span>
+                <small><%= formatDate(plan.createdAt) %> 作成</small>
+              </div>
+              <h2><a href="/plans/<%= plan.id %>"><%= plan.name %></a></h2>
+              <p class="date-range">
+                <%= formatDate(plan.startedAt) || "日程未定" %>
+                <% if (plan.endedAt) { %> 〜 <%= formatDate(plan.endedAt) %><% } %>
+              </p>
+              <div class="card-actions">
+                <a href="/plans/<%= plan.id %>">詳細</a>
+                <a href="/plans/<%= plan.id %>/update">編集</a>
+                <form action="/plans/<%= plan.id %>/delete" method="post" onsubmit="return confirm('この旅行計画を削除しますか？')">
+                  <button type="submit">削除</button>
+                </form>
+              </div>
+            </article>
+          <% }) %>
+        </section>
+      <% } %>
+
+      <nav class="pagination" aria-label="ページネーション">
+        <% if (page > 1) { %>
+          <a href="/plans?page=<%= page - 1 %>&keyword=<%= encodeURIComponent(keyword) %>&status=<%= encodeURIComponent(status) %>">＜</a>
+        <% } else { %>
+          <span>＜</span>
+        <% } %>
+        <% for (let i = 1; i <= totalPages; i += 1) { %>
+          <a class="<%= i === page ? "is-current" : "" %>" href="/plans?page=<%= i %>&keyword=<%= encodeURIComponent(keyword) %>&status=<%= encodeURIComponent(status) %>"><%= i %></a>
+        <% } %>
+        <% if (page < totalPages) { %>
+          <a href="/plans?page=<%= page + 1 %>&keyword=<%= encodeURIComponent(keyword) %>&status=<%= encodeURIComponent(status) %>">＞</a>
+        <% } else { %>
+          <span>＞</span>
+        <% } %>
+      </nav>
     </main>
   </body>
 </html>
