@@ -1,6 +1,7 @@
 import express from "express";
 import methodOverride from "method-override";
 import path from "path";
+import { initializeDatabase } from "./models";
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -21,6 +22,13 @@ app.get("/plans", (_req, res) => {
   res.render("home", { title: "旅行計画アプリ（仮）" });
 });
 
-app.listen(port, () => {
-  console.log(`Travel planner is running at http://localhost:${port}`);
-});
+initializeDatabase()
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`Travel planner is running at http://localhost:${port}`);
+    });
+  })
+  .catch((error) => {
+    console.error("Failed to initialize database", error);
+    process.exit(1);
+  });
