@@ -9,14 +9,15 @@ import type { ScheduleType } from "./models/schedule";
 const app = express();
 const port = Number(process.env.PORT || 3000);
 const pageSize = 6;
+const appRoot = process.cwd();
 
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
+app.set("views", path.join(appRoot, "src", "views"));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride("_method"));
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(appRoot, "src", "public")));
 
 function toArray<T>(value: T | T[] | undefined): T[] {
   if (value === undefined) return [];
